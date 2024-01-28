@@ -41,38 +41,29 @@ class TranslationalXY:
             raise Exception("Failed to Capture from device")
 
         x, y, w, h = self.getrect(frame0)
-        print(x, y, w, h)
         
         T = cv2.cvtColor(frame0[y:y+h, x:x+w], cv2.COLOR_BGR2GRAY)
         cv2.destroyAllWindows()
 
         alpha = 1
 
-        # Init p = 0
-
         P = np.array([0,0], dtype=np.float64)
         while True:
             # Receive frame
             ret, frame = cap.read()
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            print("\niter\n")
-
-            diff = 0
 
             if not ret:
                 raise Exception("Failed to Capture from device")
             
-            # TEST
-            uv = np.array([np.inf, np.inf])
-            # TEST
 
+            uv = np.array([np.inf, np.inf])
             iter_counter = 0
 
             while np.linalg.norm(uv) > 0.5 and iter_counter < MAX_ITER:
 
                 # Image differences: compute dIm = I(t+1, x+p) - T
                 It = self.differenceThresh(T, frame_gray[int(y + P[0]) : int(y + P[0]) + h, int(x + P[1]) : int(x + P[1]) + w], 40)
-                diff = It
                 
                 # Image gradients
                 Iy, Ix = np.gradient(np.float32(frame_gray[int(y + P[0]) : int(y + P[0]) + h, int(x + P[1]) : int(x + P[1]) + w]))
